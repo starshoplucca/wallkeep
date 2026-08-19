@@ -1,0 +1,39 @@
+name: Build full One Piece visual index
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/build-onepiece-index.mjs'
+      - '.github/workflows/build-onepiece-index.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install @tensorflow/tfjs-node@4.22.0 @tensorflow-models/mobilenet@2.1.1
+      - name: Build full One Piece indexes
+        run: node tools/build-onepiece-index.mjs
+      - name: Commit generated indexes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/onepiece-manifest.json data/onepiece/
+          if git diff --cached --quiet; then
+            echo "No index changes to commit"
+            exit 0
+          fi
+          git commit -m "Build full One Piece visual indexes"
+          git pull --rebase origin main
+          git push origin HEAD:main
