@@ -12,7 +12,7 @@ function setOf(code){const m=String(code).match(/^(OP\d{2}|EB\d{2}|ST\d{2}|PRB\d
 function mapCard(x,code){return{name:x.card_name||x.name||code,setName:x.set_name||x.card_set||setOf(code),setCode:setOf(code),collector:code,image:x.card_image||x.image||'',color:x.card_color||x.color||'',sourceImageId:String(x.card_image_id||'')}}
 function normalize(arr){let n=Math.sqrt(arr.reduce((s,x)=>s+x*x,0))||1;return arr.map(x=>x/n)}
 function roundVec(arr){return arr.map(x=>Math.round(x*1e6)/1e6)}
-function coarse(arr){const out=[];for(let i=0;i<arr.length;i+=10)out.push(Math.round(arr[i]*10000)/10000);return out}
+function coarse(arr){const out=[];for(let i=0;i<arr.length;i+=10)out.push(arr[i]);return normalize(out).map(x=>Math.round(x*10000)/10000)}
 const model=await mobilenet.load({version:2,alpha:0.5});
 const res=await fetch(API);if(!res.ok)throw new Error(`API ${res.status}`);const raw=await res.json();
 const cards=[],seen=new Set();
