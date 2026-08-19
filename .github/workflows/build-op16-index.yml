@@ -1,0 +1,31 @@
+name: Build OP16 visual index
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/build_op16_index.py'
+      - '.github/workflows/build-op16-index.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests pillow torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - name: Build index
+        run: python tools/build_op16_index.py
+      - name: Commit generated index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/op16-index.json
+          git diff --cached --quiet || git commit -m "Build OP16 visual index"
+          git push
