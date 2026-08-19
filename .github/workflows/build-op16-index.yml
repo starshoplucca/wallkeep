@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'tools/build_op16_index.py'
+      - 'tools/build-op16-index.mjs'
       - '.github/workflows/build-op16-index.yml'
 
 permissions:
@@ -15,13 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
+          node-version: '20'
       - name: Install dependencies
-        run: pip install requests pillow torch torchvision --index-url https://download.pytorch.org/whl/cpu
+        run: npm install @tensorflow/tfjs-node@4.22.0 @tensorflow-models/mobilenet@2.1.1
       - name: Build index
-        run: python tools/build_op16_index.py
+        run: node tools/build-op16-index.mjs
       - name: Commit generated index
         run: |
           git config user.name "github-actions[bot]"
